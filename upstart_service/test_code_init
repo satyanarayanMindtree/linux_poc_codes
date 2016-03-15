@@ -1,0 +1,16 @@
+description "test_code"
+author "Roger Light <roger@atchoo.org"
+
+# KOPERA : as the local will be up start test_code.
+
+start on net-device-up IFACE=lo
+
+pre-start script
+    # Make sure log this script executed
+    echo "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    touch /tmp/test_upstart
+    date >> /tmp/test_upstart
+end script
+
+respawn
+exec /bin/test_code

@@ -1,0 +1,28 @@
+#!/bin/bash
+
+if [ "$1" == "start" ];then
+    echo "starting test_code service %%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    eval "stop test_code"
+    sleep 1
+    eval "start test_code"
+fi
+
+if [ "$1" == "stop" ];then
+    echo "stopping test_code service %%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    eval "stop test_code"
+fi
+
+if [ "$1" == "restart" ];then
+    echo "stopping test_code service %%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    eval "stop test_code"
+    pgrep test_code 
+    if [ $? -eq 0 ]
+    then
+        echo "ERROR : could not stop test_code %%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+    else
+        echo "starting test_code service %%%%%%%%%%%%%%%%%%%%%%%%%%%%"
+        eval "start test_code"
+    fi
+fi
+
+exit 1

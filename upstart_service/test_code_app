@@ -1,0 +1,8 @@
+#!/bin/bash
+
+while true
+do
+    echo "upstart_test running ..."
+    # sleep for 15min
+    sleep 2    
+done
