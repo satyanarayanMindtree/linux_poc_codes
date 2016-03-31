@@ -1,0 +1,13 @@
+void sample::print() {  //some code
+}
+
+void print(sample* this) { //some code
+}
+
+s1.print()  ==> print(&s1);
+
+===================
+void sample::test(int y) { }
+void test(sample* this,int y) { }
+
+s1.test(18) ==> test(&s1,18)
