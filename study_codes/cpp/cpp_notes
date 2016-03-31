@@ -1,0 +1,66 @@
+===================================================================================================================================================
+>> Class Access Modifiers
+> public Members  
+    A public member is accessible from anywhere outside the class but within a program.
+
+> private Members 
+    A private member variable or function cannot be accessed, or even viewed from outside the class. Only the class and friend functions can access 
+    private members. By default all the members of a class would be private.
+    
+> protected Members 
+    A protected member variable or function is very similar to a private member but it provided one additional benefit that they can be accessed in 
+    child classes which are called derived classes.
+===================================================================================================================================================
+
+===================================================================================================================================================
+>> Constructor & Destructor
+> Class Constructor
+    A class constructor is a special member function of a class that is executed whenever we create new objects of that class. A constructor will have 
+    exact same name as the class and it does not have any return type at all, not even void. Constructors can be very useful for setting initial values 
+    for certain member variables.
+    > Parameterized Constructor
+        A default constructor does not have any parameter, but if you need, a constructor can have parameters. This helps you to assign initial value to 
+        an object at the time of its creation.
+        
+> Copy Constructor
+    The copy constructor is a constructor which creates an object by initializing it with an object of the same class, which has been created previously. 
+    The copy constructor is used to:
+         Initialize one object from another of the same type.
+         Copy an object to pass it as an argument to a function.
+         Copy an object to return it from a function.
+    If a copy constructor is not defined in a class, the compiler itself defines one.If the class has pointer variables and has some dynamic memory 
+    allocations, then it is a must to have a copy constructor.
+        
+> Class Destructor
+    A destructor is a special member function of a class that is executed whenever an object of it's class goes out of scope or whenever the delete 
+    expression is applied to a pointer to the object of that class. A destructor will have exact same name as the class prefixed with a tilde (~)
+    and it can neither return a value nor can it take any parameters. Destructor can be very useful for releasing resources before coming out of the 
+    program like closing files, releasing memories etc.
+===================================================================================================================================================
+
+===================================================================================================================================================    
+>> Friend Functions
+    A friend function of a class is defined outside that class' scope but it has the right to access all private and protected members of the class. 
+    Even though the prototypes for friend functions appear in the class definition, friends are not member functions. A friend can be a function, 
+    function template, or member function, or a class or class template, in which case the entire class and all of its members are friends. To declare 
+    a function as a friend of a class, precede the function prototype in the class definition with keyword friend.
+===================================================================================================================================================
+
+===================================================================================================================================================
+>> Static Members of a Class
+    We can define class members static using static keyword. When we declare a member of a class as static it means no matter how many objects of the 
+    class are created, there is only one copy of the static member. A static member is shared by all objects of the class. All static data is initialized
+    to zero when the first object is created, if no other initialization is present. We can't put it in the class definition but it can be initialized 
+    outside the class as done in the following example by redeclaring the static variable, using the scope resolution operator :: to identify which class 
+    it belongs to.
+===================================================================================================================================================
+
+
+===================================================================================================================================================
+>> Static Function Members
+    By declaring a function member as static, you make it independent of any particular object of the class. A static member function can be called 
+    even if no objects of the class exist and the static functions are accessed using only the class name and the scope resolution operator ::.
+    A static member function can only access static data member, other static member functions and any other functions from outside the class. Static 
+    member functions have a class scope and they do not have access to the this pointer of the class. You could use a static member function to determine 
+    whether some objects of the class have been created or not.
+===================================================================================================================================================
