@@ -6,7 +6,7 @@ LDFLAGS= -lpthread -lrt
 
 STRIP=$(CROSS_COMPILE)strip
 
-SOURCES= copy_constructor.cpp
+SOURCES= polymorphism.cpp
 
 OBJECTS=$(SOURCES:.cpp=.o)
 
