@@ -1,0 +1,67 @@
+==========================================================================================================================================================
+Pipes and Redirection
+
+>> Redirecting Output
+    > file descriptor 0 is the standard input to a program, file descriptor 1 is the standard output, and file descriptor 2 is the standard error output. 
+    You can redirect each of these independently. In fact, you can also redirect other file descriptors, but it’s unusual to want to redirect any other 
+    than the standard ones: 0, 1, and 2.
+        example::
+            $ ls -l > lsoutput.txt
+            which saves the output of the ls command into a file called lsoutput.txt.
+            By default, if the file already exists, then it will be overwritten. If you want to change the default behavior, you can use the command 
+            set -o noclobber (or set -C ), which sets the noclobber option to prevent a file from being overwritten using redirection. You can cancel this 
+            option using set +o noclobber .
+        example::
+            $ ps >> lsoutput.txt
+            which appends output pf ps command into file lsoutput.txt.
+    > To redirect the standard error output, preface the > operator with the number of the file descriptor you wish to redirect. Because the standard error 
+    is on file descriptor 2, use the 2> operator. This is often use-ful to discard error information and prevent it from appearing on the screen.
+        example::
+            $ kill 1234 > killout.txt 2> killerr.txt
+            will put the output and error information into separate files (killerr.txt).
+    > If you prefer to capture both sets of output into a single file, you can use the >& operator to combine the
+    two outputs. Therefore,
+        example:: 
+            $ kill 1234 > killouterr.txt 2>&1
+    > you don’t often want to save either standard output or standard error. You can use the Linux universal “bit bucket” of /dev/null to efficiently 
+    discard the entire output, like this:
+        example:: 
+            $ kill 1234 > /dev/null 2>&1
+    
+>> Redirecting Input
+    > Rather like redirecting output, you can also redirect input. For example,
+        example::
+            $ more < killout.txt
+        Obviously, this is a rather trivial example under Linux; the Linux more command is quite happy to accept filenames as parameters, unlike the Windows 
+        command-line equivalent.
+==========================================================================================================================================================
+
+==========================================================================================================================================================
+>> Environment Variables
+$0 :: The name of the shell script.
+$# :: number of parameters passed.
+$$ :: The process ID of the shell script, often used inside a script for generating unique temporary filenames; for example /tmp/tmpfile_$$
+
+>> Parameter Variables
+    If your script is invoked with parameters, some additional variables are created. If no parameters are passed, the environment variable $# still 
+    exists but has a value of 0.
+    The parameter variables are listed in the following table:
+    $1, $2, ... :: The parameters given to the script
+    $*  :: A list of all the parameters, in a single variable, separated by the first character in the environment variable IFS . If IFS is modified, then
+           the way $* separates the command line into parameters will change.
+    $@  :: A subtle variation on $* ; it doesn’t use the IFS environment variable, so parameters are not run together even if IFS is empty.
+    
+    It’s easy to see the difference between $@ and $* by trying them out:
+        $ IFS=’‘
+        $ set foo bar bam
+        $ echo “$@“
+        foo bar bam
+        $ echo “$*“
+        foobarbam
+        $ unset IFS
+        $ echo “$*“
+        foo bar bam
+        As you can see, within double quotes, $@ expands the positional parameters as separate fields, regardless of the IFS value. In general, if you want 
+        access to the parameters, $@ is the sensible choice.
+    In addition to printing the contents of variables using the echo command, you can also read them by using the read command.
+==========================================================================================================================================================
