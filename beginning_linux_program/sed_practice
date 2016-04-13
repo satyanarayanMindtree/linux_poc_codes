@@ -1,0 +1,176 @@
+===============================================================================================================================================
+marks.txt >>
+
+1)    Amit     Physics    80
+2)    Rahul    Maths      90
+3)    Shyam    Biology    87
+4)    Kedar    English    85
+5)    Hari     History    89
+
+===============================================================================================================================================
+
+
+>> Invoking sed with ‘-e’ option ( add the script to the commands to be executed )
+    example::
+        $ sed -e '2d' marks.txt
+        >> (2nd line will be deleted)
+            1)    Amit     Physics    80
+            3)    Shyam    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+        
+        $ sed -e '2d' marks.txt > output
+        >> redirect output to fule
+        
+>> Printing lines using sed ( -n flag & p command)
+    The ‘-n’ flag disables the automatic printing so that sed will instead print lines only when it is explicitly told to do so with the ‘p’ command .
+    example::
+        $ sed -n 'p' marks.txt
+        >> 
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            3)    Shyam    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+        $ sed 'p' marks.txt
+        >> 
+            1)    Amit     Physics    80
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            2)    Rahul    Maths      90
+            3)    Shyam    Biology    87
+            3)    Shyam    Biology    87
+            4)    Kedar    English    85
+            4)    Kedar    English    85
+            5)    Hari     History    89
+            5)    Hari     History    89
+        $ sed 'p' marks.txt | head -4
+        >> 
+            1)    Amit     Physics    80
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            2)    Rahul    Maths      90
+
+>> Editing the Source file by using ‘-i’ option
+    Sed command by default does not edit the orginal or source file for our safety but by using ‘-i’ option source file can be edited.
+    example::
+        $ sed -i '3d' marks.txt
+        >> will delete 3rd line of file.
+        
+>> Take backup of source file prior to editing
+    When we use ‘-i’ option in sed command then it becomes very risky because it will directly edit the source file, so it is better to take the backup of 
+    source file before editing.
+    example::
+        $ sed -i.bak '3d' marks.txt
+        >> will creat backup file marks.txt.bak and modified in marks.txt.
+        
+>> Deleting the lines 
+    > by specifying range.
+    example::
+        $ sed '1,4d' marks.txt
+        >>  (delete 1st 4 lines)
+            5)    Hari     History    89
+    
+    > empty lines of a file
+    example::
+        $ sed '/^$/d' marks.txt
+        >> delete all empty lines
+    
+    > Deleting the lines containing the strings
+    example::
+        $ sed '/Shyam/d' marks.txt
+        >> 
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            4)    Kedar    English    85
+            5)    Hari     History    89
+
+>> Search and Replace strings in the file.
+    It is very important to note that sed substitutes only the first occurrence on a line. If the string ‘root’ occurs more than once on a line, 
+    only the first match will be replaced. To replace every string in the file with the new one instead of just the first occurrence , to make 
+    substitution globally add a letter ‘g’ to end of command 
+    example::
+        $ sed 's/Shyam/Satya/' marks.txt
+        >> 
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            3)    Satya    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+        $ sed 's/Shyam/Satya/g' marks.txt
+        >> 
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            3)    Satya    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+    
+>> Multiple substitution using -e option
+    example::
+        $ sed -e 's/Shyam/Satya/g' -e 's/Maths/Embedded/g' marks.txt
+        >>
+            1)    Amit     Physics    80
+            2)    Rahul    Embedded      90
+            3)    Satya    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

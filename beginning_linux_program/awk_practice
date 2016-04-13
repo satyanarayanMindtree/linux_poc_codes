@@ -1,0 +1,78 @@
+===============================================================================================================================================
+marks.txt >>
+
+1)    Amit     Physics    80
+2)    Rahul    Maths      90
+3)    Shyam    Biology    87
+4)    Kedar    English    85
+5)    Hari     History    89
+
+===============================================================================================================================================
+
+
+
+>> Print column or field
+
+    example::
+        $ awk '{print $3 "\t" $4}' marks.txt
+        >> 
+            Physics	80
+            Maths	90
+            Biology	87
+            English	85
+            History	89
+        
+        $ awk '{print $4 "\t" $1}' marks.txt
+        >> 
+            80    1)
+            90    2)
+            87    3)
+            85    4)
+            89    5)
+
+>> Print all lines
+    examplr::
+        $ awk '{print $0}' marks.txt
+        >>
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            3)    Shyam    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+
+>> Print columns by pattern
+    example:: 
+        $ awk '/a/ {print $1 "\t" $4}' marks.txt
+        >>
+            Rahul	90
+            Shyam	87
+            Kedar	85
+            Hari	89
+
+        $ awk '/u/ {print $2 "\t" $4}' marks.txt
+        >> 
+            Rahul	90
+            
+>> Count and print matched pattern
+    example:: 
+        $ awk '/a/{++cnt} END {print "count = ", cnt}' marks.txt
+        >> 
+            count =  4
+            
+        $ awk '/ah/{++cnt} END {print "count = ", cnt}' marks.txt
+        >> 
+            count =  1
+            
+>> Print lines having more than or grater than x characters
+    example:: 
+        $ awk 'length($0) > 20' marks.txt
+        >> 
+            1)    Amit     Physics    80
+            2)    Rahul    Maths      90
+            3)    Shyam    Biology    87
+            4)    Kedar    English    85
+            5)    Hari     History    89
+        
+        $ awk 'length($0) < 20' marks.txt
+        >> no output
+            
