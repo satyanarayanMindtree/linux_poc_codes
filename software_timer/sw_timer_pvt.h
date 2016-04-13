@@ -24,7 +24,7 @@ struct sw_timer {
     void *callback_argument;
     pthread_mutex_t timer_lock;
     struct sw_timer *next;
-    
+    pthread_t sw_thread;
 };
 
 
