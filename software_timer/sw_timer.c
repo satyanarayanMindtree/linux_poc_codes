@@ -4,6 +4,7 @@
 #include "system_time.h"
 #include <pthread.h>
 #include <unistd.h>
+#include <signal.h>
 
 #define SW_TIMER_PROCESS_SLEEP 100*1000
 
@@ -15,6 +16,7 @@ void *sw_timer_process_thread (void *param) {
     
     SW_TIMER *travel_list = NULL;
     u32 current_system_time = 0x00;
+    u32 retval = 0x00;
     
     while (TerminateFlag__) {
         
@@ -27,14 +29,18 @@ void *sw_timer_process_thread (void *param) {
                 if (current_system_time >= (travel_list->timer_start_time + travel_list->timer_timeout)) {
                
                     travel_list->state = TIMER_IDLE;
-                    (*travel_list->callback_function)(travel_list->callback_argument);                    
+                    
+                    retval = pthread_create(&travel_list->sw_thread, NULL, travel_list->callback_function, travel_list->callback_argument);
+                    if (retval != 0x00) {
+                        return NULL;
+                    }
                 }
             }            
             travel_list = travel_list->next;            
         }
         
         // Sleep for few ms
-        usleep(SW_TIMER_PROCESS_SLEEP);
+//         usleep(SW_TIMER_PROCESS_SLEEP);
     }
     
     return NULL;
@@ -59,7 +65,8 @@ s8 sw_timer_term (void) {
     // free all registered sw_timer objects
     timer_object = SwTimerListHead__;
     
-    while (timer_object != NULL) {      
+    while (timer_object != NULL) {     
+        pthread_kill(timer_object->sw_thread, SIGKILL);
         free(timer_object);
         timer_object = timer_object->next;
     }
@@ -179,6 +186,7 @@ s8 sw_timer_delete (void *user_timer_object) {
         SwTimerListHead__ = timer_object->next;        
         
         // delete timer object
+        pthread_kill(timer_object->sw_thread, SIGKILL);
         free(timer_object);
         user_timer_object = NULL;        
     }
@@ -194,6 +202,7 @@ s8 sw_timer_delete (void *user_timer_object) {
             travel_list->next = timer_object->next;
             
             // delete timer object
+            pthread_kill(timer_object->sw_thread, SIGKILL);
             free(timer_object);
             user_timer_object = NULL;
         }

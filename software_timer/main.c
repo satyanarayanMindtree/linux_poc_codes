@@ -3,9 +3,12 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <signal.h>
-
+#include <stdlib.h>
+#include <string.h>
 
 #include"sw_timer.h"
+
+#define MAX_TIMER_OBJ 10
 
 /*
  * Variable naming standard
@@ -17,69 +20,104 @@
 
 static u8 TerminateFlag__ = 0x00;
 
-void *timer_obj = NULL;
-void *timer_obj_1 = NULL;
+void *TimerObjAaray[MAX_TIMER_OBJ];
 
 void *callback_function (void * arg) {
  
-    printf ("\nFunction:: %s %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", __func__);
-    
+//     printf ("\nFunction:: %s %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", __func__);
+    char command[100];
+
+    sprintf(command, "\necho \"%lu\" >> /tmp/sw_timer_test", (long unsigned int )arg);
+    system(command);
     return NULL;
 }
 
-void *callback_function_1 (void * arg) {
- 
-    printf ("\nFunction:: %s %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%", __func__);
-    
-    return NULL;
-}
-
-void sigint_handler (int signal_recieved) {
-
-    printf ("\nDeleting timer !!!!!!!");
-//     sw_timer_update(timer_obj, 5, callback_function_1, NULL);    
-    sw_timer_delete(timer_obj);
-    
-}
-
-void sigterm_handler (int signal_recieved) {
-
-    printf ("\nStarting timer !!!!!!!");
-    sw_timer_start(timer_obj);
-    
+int get_empty_timer_obj (void) {
+    int timer_obj = 0x00;
+    for( timer_obj = 0x00; timer_obj < MAX_TIMER_OBJ; timer_obj++) {
+        if (TimerObjAaray[timer_obj] == NULL)
+            break;
+    }    
+    if (timer_obj >= MAX_TIMER_OBJ)
+        return -1;
+    else 
+        return timer_obj;   
 }
 
 int main (int argc, char **argv)
-{
-    struct sigaction sigIntHandler, sigTermHandler;
-
-    sigIntHandler.sa_handler = sigint_handler;
-    sigemptyset (&sigIntHandler.sa_mask);
-    sigIntHandler.sa_flags = 0;
-    sigaction (SIGINT, &sigIntHandler, NULL);
-
-    sigTermHandler.sa_handler = sigterm_handler;
-    sigemptyset (&sigTermHandler.sa_mask);
-    sigTermHandler.sa_flags = 0;
-    sigaction (SIGTERM, &sigTermHandler, NULL);
-
+{    
+    int choice = 0x00;
     
     printf ("\nPID:: %d", getpid());
     
     sw_timer_init ();
     
-    sw_timer_get_timer_object(&timer_obj, 5, callback_function, NULL);    
-    sw_timer_get_timer_object(&timer_obj_1, 2, callback_function_1, NULL);    
-    
-    sw_timer_start(timer_obj);
-    sw_timer_start(timer_obj_1);
-    printf ("\nStarted timer !!!!!!!");
-    
     TerminateFlag__ = 0x01;
     
     while (TerminateFlag__) {
-        printf ("\n Going for sleep ..."); 
-        sleep(1);
+        printf ("\n1.Creat sw_timer\n2.Start sw_timer\n3.Stop sw_timer\n4.Delete sw_timer\n5.Exit");
+        printf ("\nEnter your choice:: ");
+        scanf ("%d", &choice);
+        switch (choice) {
+            case 1:
+                {
+                    int timer_timeout = 0x00;
+                    int timer_obj = 0x00;
+                    
+                    printf ("\nEnter timer_out:: ");
+                    scanf ("%d", &timer_timeout);
+                    
+                    timer_obj = get_empty_timer_obj ();
+                    if (timer_obj != -1) {
+                        sw_timer_get_timer_object (&TimerObjAaray[timer_obj], timer_timeout, callback_function, &TimerObjAaray[timer_obj]);    
+                    }                
+                }
+                break;
+            case 2:
+                {
+                    int timer_obj = 0x00;
+                    
+                    printf ("\nEnter timer_obj:: ");
+                    scanf ("%d", &timer_obj);
+                   
+                    if ((timer_obj < MAX_TIMER_OBJ) && (TimerObjAaray[timer_obj] != NULL)) {
+                        sw_timer_start (TimerObjAaray[timer_obj]);    
+                    }          
+                }
+                break;
+            case 3:
+                {
+                    int timer_obj = 0x00;
+                    
+                    printf ("\nEnter timer_obj:: ");
+                    scanf ("%d", &timer_obj);
+                   
+                    if ((timer_obj < MAX_TIMER_OBJ) && (TimerObjAaray[timer_obj] != NULL)) {
+                        sw_timer_stop (TimerObjAaray[timer_obj]);    
+                    }          
+                }
+                break;
+            case 4:
+                {
+                    int timer_obj = 0x00;
+                    
+                    printf ("\nEnter timer_obj:: ");
+                    scanf ("%d", &timer_obj);
+                   
+                    if ((timer_obj < MAX_TIMER_OBJ) && (TimerObjAaray[timer_obj] != NULL)) {
+                        sw_timer_delete (TimerObjAaray[timer_obj]);    
+                        TimerObjAaray[timer_obj] = NULL;
+                    }          
+                }
+                break;
+            case 5:
+            {
+                TerminateFlag__ = 0x00;
+                printf ("\nTerminating Program");
+            }
+            break;
+        
+        }
     }
     
     sw_timer_term ();
