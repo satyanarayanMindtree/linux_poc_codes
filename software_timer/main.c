@@ -47,6 +47,7 @@ int get_empty_timer_obj (void) {
 int main (int argc, char **argv)
 {    
     int choice = 0x00;
+    char input[20] = {0};
     
     printf ("\nPID:: %d", getpid());
     
@@ -57,16 +58,22 @@ int main (int argc, char **argv)
     while (TerminateFlag__) {
         printf ("\n1.Creat sw_timer\n2.Start sw_timer\n3.Stop sw_timer\n4.Delete sw_timer\n5.Exit");
         printf ("\nEnter your choice:: ");
-        scanf ("%d", &choice);
+        
+        memset (input, 0x00, sizeof(input));
+        fgets (input, sizeof(input), stdin);
+        choice = atoi (input);
+
         switch (choice) {
             case 1:
                 {
                     int timer_timeout = 0x00;
                     int timer_obj = 0x00;
                     
-                    printf ("\nEnter timer_out:: ");
-                    scanf ("%d", &timer_timeout);
-                    
+                    printf ("\nEnter timer_timeout:: ");
+                    memset (input, 0x00, sizeof(input));
+                    fgets (input, sizeof(input), stdin);
+                    timer_timeout = atoi (input);
+
                     timer_obj = get_empty_timer_obj ();
                     if (timer_obj != -1) {
                         sw_timer_get_timer_object (&TimerObjAaray[timer_obj], timer_timeout, callback_function, &TimerObjAaray[timer_obj]);    
@@ -78,8 +85,10 @@ int main (int argc, char **argv)
                     int timer_obj = 0x00;
                     
                     printf ("\nEnter timer_obj:: ");
-                    scanf ("%d", &timer_obj);
-                   
+                    memset (input, 0x00, sizeof(input));
+                    fgets (input, sizeof(input), stdin);
+                    timer_obj = atoi (input);
+
                     if ((timer_obj < MAX_TIMER_OBJ) && (TimerObjAaray[timer_obj] != NULL)) {
                         sw_timer_start (TimerObjAaray[timer_obj]);    
                     }          
@@ -90,7 +99,9 @@ int main (int argc, char **argv)
                     int timer_obj = 0x00;
                     
                     printf ("\nEnter timer_obj:: ");
-                    scanf ("%d", &timer_obj);
+                    memset (input, 0x00, sizeof(input));
+                    fgets (input, sizeof(input), stdin);
+                    timer_obj = atoi (input);
                    
                     if ((timer_obj < MAX_TIMER_OBJ) && (TimerObjAaray[timer_obj] != NULL)) {
                         sw_timer_stop (TimerObjAaray[timer_obj]);    
@@ -102,7 +113,9 @@ int main (int argc, char **argv)
                     int timer_obj = 0x00;
                     
                     printf ("\nEnter timer_obj:: ");
-                    scanf ("%d", &timer_obj);
+                    memset (input, 0x00, sizeof(input));
+                    fgets (input, sizeof(input), stdin);
+                    timer_obj = atoi (input);
                    
                     if ((timer_obj < MAX_TIMER_OBJ) && (TimerObjAaray[timer_obj] != NULL)) {
                         sw_timer_delete (TimerObjAaray[timer_obj]);    

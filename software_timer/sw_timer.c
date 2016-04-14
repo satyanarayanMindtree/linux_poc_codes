@@ -99,6 +99,18 @@ s8 sw_timer_get_timer_object (void **user_timer_object, u32 timer_time_out, void
     return 0;
 }
 
+static s8 sw_timer_object_validate_register (SW_TIMER *user_timer_object) {
+    SW_TIMER *travel_list = SwTimerListHead__;
+    
+    while (travel_list->next != NULL) {
+        
+        if (travel_list == user_timer_object)
+            return 0;
+    }
+    
+    return -1;
+}
+
 s8 sw_timer_start (void *user_timer_object) {
     
     SW_TIMER *timer_object = NULL;
@@ -124,101 +136,31 @@ s8 sw_timer_start (void *user_timer_object) {
         timer_object->state = TIMER_RUNNING;
     }
     else {
-        
-        SW_TIMER *travel_list = SwTimerListHead__;
-        
-        while (travel_list->next != NULL) {
-            
-            travel_list = travel_list->next;
-        }
-        
-        travel_list->next = timer_object;        
-        timer_object->timer_start_time = system_time_sec ();
-        // change state to TIMER_RUNNING
-        timer_object->state = TIMER_RUNNING;
-        
-    }           
-    
-    return 0;
-}
-
-s8 sw_timer_stop (void *user_timer_object) {
-
-    SW_TIMER *timer_object = NULL;
-    SW_TIMER *travel_list = SwTimerListHead__;
-    
-    if (user_timer_object == NULL)
-        return -2;
-
-    timer_object = (SW_TIMER *) user_timer_object;   
-    
-    while (travel_list != timer_object) {
-        
-        travel_list = travel_list->next;
-    }
-    
-    if (travel_list == timer_object) {
-    
-        // change timer state to TIMER_STOP
-        travel_list->state = TIMER_STOP;
-
-        return 0;
-    }
-    else {
-        
-        // on invalid user_timer_object
-        return -2;
-    }
-}
-
-s8 sw_timer_delete (void *user_timer_object) {
-
-    SW_TIMER *timer_object = NULL;
-    SW_TIMER *travel_list = SwTimerListHead__;
-    
-    if (user_timer_object == NULL)
-        return -2;
-
-    timer_object = (SW_TIMER *) user_timer_object;   
-    
-    if (SwTimerListHead__ == user_timer_object) {
-    
-        SwTimerListHead__ = timer_object->next;        
-        
-        // delete timer object
-        pthread_kill(timer_object->sw_thread, SIGKILL);
-        free(timer_object);
-        user_timer_object = NULL;        
-    }
-    else {
-    
-        while (travel_list->next != timer_object) {
-            
-            travel_list = travel_list->next;
-        }
-        
-        if (travel_list->next == timer_object) {
-            
-            travel_list->next = timer_object->next;
-            
-            // delete timer object
-            pthread_kill(timer_object->sw_thread, SIGKILL);
-            free(timer_object);
-            user_timer_object = NULL;
+        // check timer object already registered or not
+        if (sw_timer_object_validate_register (timer_object) == 0) {
+            timer_object->timer_start_time = system_time_sec ();
+            // change state to TIMER_RUNNING
+            timer_object->state = TIMER_RUNNING;        
         }
         else {
+            // if not registered then register
+            SW_TIMER *travel_list = SwTimerListHead__;
             
-            // on invalid user_timer_object
-            return -2;
+            while (travel_list->next != NULL) {
+                
+                travel_list = travel_list->next;
+            }
+            
+            travel_list->next = timer_object;        
+            timer_object->timer_start_time = system_time_sec ();
+            // change state to TIMER_RUNNING
+            timer_object->state = TIMER_RUNNING;
         }
-    }
-    if (SwTimerListHead__ == NULL)
-    {
-        // kill SwTimerThread__
-    }
-    
+    }           
+
     return 0;
 }
+
 
 s8 sw_timer_reload (void *user_timer_object, u32 timer_time_out) {
     
@@ -249,37 +191,6 @@ s8 sw_timer_reload (void *user_timer_object, u32 timer_time_out) {
     }
 }
 
-s8 sw_timer_update (void *user_timer_object, u32 timer_time_out, void *callback_func, void *callback_arg) {
-    
-    SW_TIMER *timer_object = NULL;
-    SW_TIMER *travel_list = SwTimerListHead__;
-    
-    if (user_timer_object == NULL)
-        return -2;
-
-    timer_object = (SW_TIMER *) user_timer_object;   
-    
-    while (travel_list != timer_object) {
-        
-        travel_list = travel_list->next;
-    }
-    
-    if (travel_list == timer_object) {
-        
-        timer_object->timer_timeout = timer_time_out;
-        timer_object->callback_function = callback_func;
-        timer_object->callback_argument = callback_arg;
-        timer_object->state = TIMER_IDLE;
-        timer_object->timer_start_time = 0x00;
-        
-        return 0;
-    }
-    else {
-        
-        // on invalid user_timer_object
-        return -2;
-    }    
-}
 
 s8 sw_timer_restart (void *user_timer_object) {
     
@@ -290,6 +201,11 @@ s8 sw_timer_restart (void *user_timer_object) {
         return -2;
 
     timer_object = (SW_TIMER *) user_timer_object;   
+    
+    if (SwTimerListHead__ == NULL)
+    {
+        return 0;
+    } 
     
     while (travel_list != timer_object) {
         
@@ -309,3 +225,122 @@ s8 sw_timer_restart (void *user_timer_object) {
         return -2;
     }
 }
+
+
+s8 sw_timer_stop (void *user_timer_object) {
+
+    SW_TIMER *timer_object = NULL;
+    SW_TIMER *travel_list = SwTimerListHead__;
+    
+    if (user_timer_object == NULL)
+        return -2;
+
+    timer_object = (SW_TIMER *) user_timer_object;   
+    
+    if (SwTimerListHead__ == NULL)
+    {
+        return 0;
+    }  
+    
+    while (travel_list != timer_object) {
+        
+        travel_list = travel_list->next;
+    }
+    
+    if (travel_list == timer_object) {
+    
+        // change timer state to TIMER_STOP
+        travel_list->state = TIMER_STOP;
+
+        return 0;
+    }
+    else {
+        
+        // on invalid user_timer_object
+        return -2;
+    }
+}
+
+s8 sw_timer_delete (void *user_timer_object) {
+
+    SW_TIMER *timer_object = NULL;
+    SW_TIMER *travel_list = SwTimerListHead__;
+    
+    if (user_timer_object == NULL)
+        return -2;
+
+    timer_object = (SW_TIMER *) user_timer_object;   
+
+    if (SwTimerListHead__ == NULL)
+    {
+        // kill SwTimerThread__
+        return 0;
+    }    
+
+    if (SwTimerListHead__ == timer_object) {
+    
+        SwTimerListHead__ = timer_object->next;        
+        
+        // delete timer object
+        pthread_kill(timer_object->sw_thread, SIGKILL);
+        free(timer_object);
+        user_timer_object = NULL;        
+    }
+    else {
+    
+        while (travel_list->next != timer_object) {
+            
+            travel_list = travel_list->next;
+        }
+        
+        if (travel_list->next == timer_object) {
+            
+            travel_list->next = timer_object->next;
+            
+            // delete timer object
+            pthread_kill(timer_object->sw_thread, SIGKILL);
+            free(timer_object);
+            user_timer_object = NULL;
+        }
+        else {
+            
+            // on invalid user_timer_object
+            return -2;
+        }
+    }
+    
+    return 0;
+}
+
+
+// s8 sw_timer_update (void *user_timer_object, u32 timer_time_out, void *callback_func, void *callback_arg) {
+//     
+//     SW_TIMER *timer_object = NULL;
+//     SW_TIMER *travel_list = SwTimerListHead__;
+//     
+//     if (user_timer_object == NULL)
+//         return -2;
+// 
+//     timer_object = (SW_TIMER *) user_timer_object;   
+//     
+//     while (travel_list != timer_object) {
+//         
+//         travel_list = travel_list->next;
+//     }
+//     
+//     if (travel_list == timer_object) {
+//         
+//         timer_object->timer_timeout = timer_time_out;
+//         timer_object->callback_function = callback_func;
+//         timer_object->callback_argument = callback_arg;
+//         timer_object->state = TIMER_IDLE;
+//         timer_object->timer_start_time = 0x00;
+//         
+//         return 0;
+//     }
+//     else {
+//         
+//         // on invalid user_timer_object
+//         return -2;
+//     }    
+// }
