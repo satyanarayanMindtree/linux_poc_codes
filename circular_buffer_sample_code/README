@@ -1,6 +1,0 @@
-Circular Buffer sample implementation
-To compile:
-	sh build.sh 
-
-To Run Test App:
-	./test
